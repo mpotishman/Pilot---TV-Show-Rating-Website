@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
   reactCompiler: true,
+  images: {
+    domains: ['image.tmdb.org'], // allow images from TMDB
+  },
+  experimental: {
+    scrollRestoration: false, // Add this line
+  },
 };
 
 export default nextConfig;
