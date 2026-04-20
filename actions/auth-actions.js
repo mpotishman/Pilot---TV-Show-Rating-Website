@@ -1,7 +1,7 @@
 "use server";
 import { createAuthSection, destroySession } from "@/lib/auth";
 import { hashUserPassword, verifyPassword } from "@/lib/hash";
-import { createUser, getUserByUsername } from "@/lib/user";
+import { createUser, getAuthUserByUsername } from "@/lib/user";
 import { redirect } from "next/navigation";
 
 export async function signUp(prevSate, formData) {
@@ -51,10 +51,10 @@ export async function signUp(prevSate, formData) {
 }
 
 export async function login(prevSate, formData) {
-  const username = formData.get("username");
-  const password = formData.get("password");
+  const username = formData.get("username")?.toString().trim();
+  const password = formData.get("password")?.toString() ?? "";
 
-  const existingUser = getUserByUsername(username);
+  const existingUser = getAuthUserByUsername(username);
 
   if (!existingUser) {
     return {

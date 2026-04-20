@@ -3,6 +3,7 @@
 import { insertRating, insertSeasonRating } from "@/lib/ratings";
 import { getCurrentUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { addActivity } from "@/lib/activity-actions";
 
 export async function submitRating(prevState, formData) {
   const currentUser = await getCurrentUser();
@@ -51,6 +52,16 @@ export async function submitRating(prevState, formData) {
       parseInt(rating, 10),
       review
     );
+
+    await addActivity({
+      user_id: userId,
+      type: "episode_rating",
+      show_id: showId,
+      season_number: parseInt(seasonNumber, 10),
+      episode_number: parseInt(episodeNumber, 10),
+      rating: parseInt(rating, 10),
+      review,
+    });
 
     // Revalidate the page so the new data shows up immediately
     revalidatePath(
@@ -117,6 +128,16 @@ export async function submitSeasonRating(prevState, formData) {
       avgValue,
       seasonReview
     );
+
+    await addActivity({
+      user_id: userId,
+      type: "season_rating",
+      show_id: showId,
+      season_number: parseInt(seasonNumber, 10),
+      rating: avgValue,
+      review: seasonReview,
+    });
+
 
     // Revalidate the page so the new data shows up immediately
     revalidatePath(`/${username}/shows/${showId}?tab=episodes&season=${seasonNumber}`);
