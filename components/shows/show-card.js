@@ -1,16 +1,12 @@
 "use client";
-// components/show-card.tsx
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 export default function ShowCard({ show, type, username }) {
   const posterUrl = show?.poster_path
     ? `https://image.tmdb.org/t/p/w780${show.poster_path}`
     : "/images/hero.jpg";
-  
-  const pathname = usePathname();
 
   // Build href based on whether username exists
   const showHref = username 

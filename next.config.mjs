@@ -2,10 +2,15 @@
 const nextConfig = {
   reactCompiler: true,
   images: {
-    domains: ['image.tmdb.org'], // allow images from TMDB
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "image.tmdb.org",
+      },
+    ],
   },
   experimental: {
-    scrollRestoration: false, // Add this line
+    scrollRestoration: false,
   },
 };
 

@@ -1,231 +1,90 @@
-// get current popular tv shows
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
+const TMDB_BASE_URL = "https://api.themoviedb.org/3";
+
+function getApiKey() {
+  if (!TMDB_API_KEY) {
+    throw new Error("Missing TMDB_API_KEY");
+  }
+
+  return TMDB_API_KEY;
+}
+
+async function fetchTMDB(path, { searchParams = {}, revalidate = 3600 } = {}) {
+  const url = new URL(`${TMDB_BASE_URL}${path}`);
+  url.searchParams.set("api_key", getApiKey());
+  url.searchParams.set("language", "en-US");
+
+  for (const [key, value] of Object.entries(searchParams)) {
+    if (value != null) {
+      url.searchParams.set(key, String(value));
+    }
+  }
+
+  const response = await fetch(url.toString(), {
+    next: { revalidate },
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => "<no body>");
+    throw new Error(
+      `TMDB request failed for ${path}: ${response.status} ${response.statusText} - ${text}`
+    );
+  }
+
+  return response.json();
+}
+
+function filterEnglishResults(data) {
+  return {
+    ...data,
+    results: Array.isArray(data?.results)
+      ? data.results.filter((show) => show.original_language === "en")
+      : [],
+  };
+}
+
 export async function getPopular() {
-  const API_KEY = process.env.TMDB_API_KEY;
-  console.log("TMDB_API_KEY present?", Boolean(API_KEY));
+  const data = await fetchTMDB("/tv/popular", {
+    searchParams: { page: 1 },
+    revalidate: 60,
+  });
 
-  const url = `https://api.themoviedb.org/3/tv/popular?language=en-US&page=1&api_key=${API_KEY}`;
-
-  const res = await fetch(url, { next: { revalidate: 60 } });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "<no body>");
-    throw new Error(
-      `Failed to fetch shows — status: ${res.status} ${res.statusText} — body: ${text}`
-    );
-  }
-
-  const data = await res.json();
-
-  // filter to only English shows
-  const filteredResults = data.results.filter(
-    (show) => show.original_language === "en"
-  );
-
-  return {
-    ...data,
-    results: filteredResults,
-  };
+  return filterEnglishResults(data);
 }
 
-// get current trending tv shows
 export async function getTrending() {
-  const API_KEY = process.env.TMDB_API_KEY;
-  console.log("TMDB_API_KEY present?", Boolean(API_KEY));
+  const data = await fetchTMDB("/trending/tv/week", {
+    searchParams: { page: 1 },
+    revalidate: 60,
+  });
 
-  const url = `https://api.themoviedb.org/3/tv/week?language=en-US&page=1&api_key=${API_KEY}`;
-
-  const res = await fetch(url, { next: { revalidate: 60 } });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "<no body>");
-    throw new Error(
-      `Failed to fetch shows — status: ${res.status} ${res.statusText} — body: ${text}`
-    );
-  }
-
-  const data = await res.json();
-
-  // filter to only English shows
-  const filteredResults = data.results.filter(
-    (show) => show.original_language === "en"
-  );
-
-  return {
-    ...data,
-    results: filteredResults,
-  };
+  return filterEnglishResults(data);
 }
 
-// Fetch show details from TMDB API
-// src/actions/actions.js
-export async function getTVDetails(showID) {
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwYjNhOWY1ODFkZmNkM2JlOWRhMWY1YjY5Y2JiOTI1ZSIsIm5iZiI6MTc0MjY2OTUzNS41MzYsInN1YiI6IjY3ZGYwNmRmYjhlMGZlYTkzNDA3YjIzOSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.XDdAstLPRdpZk__A0i_T2L0qkF9IvdjBsmO_ul4fxFM",
-    },
-  };
-
-  const res = await fetch(
-    `https://api.themoviedb.org/3/tv/${showID}?language=en-US`,
-    options
-  );
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch show ${showID}: ${res.status}`);
-  }
-
-  return res.json();
+export async function getTVDetails(showId) {
+  return fetchTMDB(`/tv/${showId}`);
 }
 
-export async function getSeasonDetails(showID, seasonNumber) {
-  // console.log("=== GET SEASON DETAILS ===");
-  // console.log("showID:", showID);
-  // console.log("seasonNumber:", seasonNumber);
-
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwYjNhOWY1ODFkZmNkM2JlOWRhMWY1YjY5Y2JiOTI1ZSIsIm5iZiI6MTc0MjY2OTUzNS41MzYsInN1YiI6IjY3ZGYwNmRmYjhlMGZlYTkzNDA3YjIzOSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.XDdAstLPRdpZk__A0i_T2L0qkF9IvdjBsmO_ul4fxFM",
-    },
-  };
-
-  const url = `https://api.themoviedb.org/3/tv/${showID}/season/${seasonNumber}?language=en-US`;
-  console.log("Fetching URL:", url);
-
-  const res = await fetch(url, options);
-
-  if (!res.ok) {
-    console.error("Fetch failed:", res.status, res.statusText);
-    throw new Error(
-      `Failed to fetch season ${seasonNumber} for show ${showID}: ${res.status}`
-    );
-  }
-
-  const data = await res.json();
-  console.log(
-    "Season data received:",
-    data?.name,
-    "Episodes:",
-    data?.episodes?.length
-  );
-
-  return data;
+export async function getSeasonDetails(showId, seasonNumber) {
+  return fetchTMDB(`/tv/${showId}/season/${seasonNumber}`);
 }
 
 export async function getEpisodeDetails(showId, seasonNumber, episodeNumber) {
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwYjNhOWY1ODFkZmNkM2JlOWRhMWY1YjY5Y2JiOTI1ZSIsIm5iZiI6MTc0MjY2OTUzNS41MzYsInN1YiI6IjY3ZGYwNmRmYjhlMGZlYTkzNDA3YjIzOSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.XDdAstLPRdpZk__A0i_T2L0qkF9IvdjBsmO_ul4fxFM",
-    },
-  };
-
-  const url = `https://api.themoviedb.org/3/tv/${showId}/season/${seasonNumber}/episode/${episodeNumber}?language=en-US`;
-  console.log("Fetching URL:", url);
-
-  const res = await fetch(url, options);
-
-  if (!res.ok) {
-    console.error("Fetch failed:", res.status, res.statusText);
-    throw new Error(
-      `Failed to fetch episode ${episodeNumber} for season ${seasonNumber} for show ${showID}: ${res.status}`
-    );
-  }
-
-  const data = await res.json();
-  console.log(
-    "Episode data received:",
-    data?.name,
-    "Episodes:",
-    data?.episodes?.length
+  return fetchTMDB(
+    `/tv/${showId}/season/${seasonNumber}/episode/${episodeNumber}`
   );
-
-  return data;
 }
 
 export async function getCastDetails(showId) {
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwYjNhOWY1ODFkZmNkM2JlOWRhMWY1YjY5Y2JiOTI1ZSIsIm5iZiI6MTc0MjY2OTUzNS41MzYsInN1YiI6IjY3ZGYwNmRmYjhlMGZlYTkzNDA3YjIzOSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.XDdAstLPRdpZk__A0i_T2L0qkF9IvdjBsmO_ul4fxFM",
-    },
-  };
-
-  const url = `https://api.themoviedb.org/3/tv/${showId}/aggregate_credits?language=en-US`;
-  console.log("Fetching URL:", url);
-
-  const res = await fetch(url, options);
-
-  if (!res.ok) {
-    console.error("Fetch failed:", res.status, res.statusText);
-    throw new Error(
-      `Failed to fetch cast for show with showId = ${showId}`
-    );
-  }
-
-  const data = await res.json();
-
-  return data;
+  return fetchTMDB(`/tv/${showId}/aggregate_credits`);
 }
 
 export async function getSimilarshows(showId) {
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwYjNhOWY1ODFkZmNkM2JlOWRhMWY1YjY5Y2JiOTI1ZSIsIm5iZiI6MTc0MjY2OTUzNS41MzYsInN1YiI6IjY3ZGYwNmRmYjhlMGZlYTkzNDA3YjIzOSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.XDdAstLPRdpZk__A0i_T2L0qkF9IvdjBsmO_ul4fxFM",
-    },
-  };
-
-  const url = `https://api.themoviedb.org/3/tv/${showId}/similar?language=en-US&page=1`;
-  console.log("Fetching URL:", url);
-
-  const res = await fetch(url, options);
-
-  if (!res.ok) {
-    console.error("Fetch failed:", res.status, res.statusText);
-    throw new Error(
-      `Failed to fetch cast for show with showId = ${showId}`
-    );
-  }
-
-  const data = await res.json();
-
-  return data;
+  return fetchTMDB(`/tv/${showId}/similar`, {
+    searchParams: { page: 1 },
+  });
 }
 
-export default async function getShowById(showId){
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwYjNhOWY1ODFkZmNkM2JlOWRhMWY1YjY5Y2JiOTI1ZSIsIm5iZiI6MTc0MjY2OTUzNS41MzYsInN1YiI6IjY3ZGYwNmRmYjhlMGZlYTkzNDA3YjIzOSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.XDdAstLPRdpZk__A0i_T2L0qkF9IvdjBsmO_ul4fxFM",
-    },
-  };
-
-  const url = `https://api.themoviedb.org/3/tv/${showId}?language=en-US`;
-  console.log("Fetching URL:", url);
-
-  const res = await fetch(url, options);
-
-  if (!res.ok) {
-    console.error("Fetch failed:", res.status, res.statusText);
-    throw new Error(
-      `Failed to fetch cast for show with showId = ${showId}`
-    );
-  }
-
-  const data = await res.json();
-
-  return data;
+export default async function getShowById(showId) {
+  return getTVDetails(showId);
 }
-

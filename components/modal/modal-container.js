@@ -1,57 +1,7 @@
-import { getCurrentUser } from "@/lib/auth";
 import LogInModal from "./log-in-modal";
-import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import EpisodeDescriptionSection from "./episode-desciption-section";
 import RatingModal from "./rating-modal";
-import { useEffect } from "react";
-
-// Object
-// air_date
-// :
-// "2016-07-15"
-// crew
-// :
-// (5) [{…}, {…}, {…}, {…}, {…}]
-// episode_number
-// :
-// 1
-// episode_type
-// :
-// "standard"
-// guest_stars
-// :
-// (15) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
-// id
-// :
-// 1198665
-// name
-// :
-// "Chapter One: The Vanishing of Will Byers"
-// overview
-// :
-// "On his way home from a friend's house, young Will sees something terrifying. Nearby, a sinister secret lurks in the depths of a government lab."
-// production_code
-// :
-// "0"
-// runtime
-// :
-// 48
-// season_number
-// :
-// 1
-// still_path
-// :
-// "/uLES7sRpy7Ih6Kr6XCaYj1GyfTw.jpg"
-// vote_average
-// :
-// 8.506
-// vote_count
-// :
-// 1634
-// [[Prototype]]
-// :
-// Object
 
 export default function ModalContainer({
   allUserInfo,
@@ -60,7 +10,6 @@ export default function ModalContainer({
   currentEpisode,
   currentSeason,
 }) {
-  // destructure
   const { isLoggedIn, viewing, canEdit, viewedProfileUsername } = allUserInfo;
   const { showInfo, episodeInfo } = allShowInfo;
   useEffect(() => {
@@ -72,9 +21,6 @@ export default function ModalContainer({
 
   let innerContent;
 
-  // ==========================================================
-  // CASE 1 — NOT LOGGED IN + NOT VIEWING + ON SHOW PAGE (Login required)
-  // ==========================================================
   if (!isLoggedIn && viewing === false) {
     innerContent = (
       <>
@@ -99,12 +45,7 @@ export default function ModalContainer({
         <LogInModal />
       </>
     );
-  }
-
-  // ==========================================================
-  // CASE 2 — LOGGED IN + CAN EDIT (Your own rating)
-  // ==========================================================
-  else if (isLoggedIn && canEdit) {
+  } else if (isLoggedIn && canEdit) {
     innerContent = (
       <>
         <div className="full-section flex flex-col gap-4">
@@ -119,17 +60,13 @@ export default function ModalContainer({
             episodeInfo={episodeInfo}
             onClick={onClick}
             type={"rating"}
+            currentSeason={currentSeason}
+            currentEpisode={currentEpisode}
           />
         </div>
       </>
     );
-  }
-
-  // ==========================================================
-  // CASE 3 — VIEWING ANOTHER USER'S RATING - (isLoggedIn && !canEdit) || (!isLoggedIn && viewing === true)
-
-  // ==========================================================
-  else if ((isLoggedIn && !canEdit) || (!isLoggedIn && viewing === true)) {
+  } else if ((isLoggedIn && !canEdit) || (!isLoggedIn && viewing === true)) {
     innerContent = (
       <>
         <div className="full-section flex flex-col gap-4">
@@ -145,16 +82,15 @@ export default function ModalContainer({
             viewedProfileUsername={viewedProfileUsername}
             onClick={onClick}
             type={"viewing"}
+            currentSeason={currentSeason}
+            currentEpisode={currentEpisode}
           />
         </div>
       </>
     );
   }
 
-  // ==========================================================
-  // MAIN WRAPPER FOR ALL CASES
-  // ==========================================================
-  const mainContent = (
+  return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/80" onClick={onClick} />
 
@@ -163,6 +99,4 @@ export default function ModalContainer({
       </div>
     </div>
   );
-
-  return mainContent;
 }

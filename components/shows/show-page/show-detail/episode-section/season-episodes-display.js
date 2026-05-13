@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import IndividualEpisodes from "./individual-episodes";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ModalContainer from "@/components/modal/modal-container";

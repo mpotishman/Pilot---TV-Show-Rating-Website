@@ -16,8 +16,6 @@ export default function RatingModal({
   const [state, formAction, isPending] = useActionState(submitRating, {});
 
   const {
-    canEdit,
-    viewedUserRatingInfo,
     currentUserRatingInfo,
     viewedProfileUsername,
   } = allUserInfo || {};

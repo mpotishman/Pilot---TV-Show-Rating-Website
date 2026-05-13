@@ -1,52 +1,36 @@
-// ShowTopSection.js
 "use client";
 import TabButtons from "@/components/buttons/tab-buttons";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useActionState } from "react";
-import { useState } from "react";
+import React, { useActionState, useState } from "react";
 
 import { Star } from "lucide-react";
-import { getCurrentCacheVersion } from "next/dist/client/components/segment-cache-impl/cache";
-import { getCurrentUser } from "@/lib/auth";
 import addShowToWatchlist from "@/actions/watchlist-actions";
 
 export default function ShowTopSection({
   show,
   showId,
-  isLoggedIn,
   userId,
-  isOwnProfile,
   allUserInfo,
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  //   Debug statements
-  //   console.log("Show name:", show.name);
-  //   console.log("Show seasons:", show.number_of_seasons);
-  //   console.log("Show air_date:", show.first_air_date);
-
-  // destructure show to get some values
   let { name, overview, genres, first_air_date, number_of_seasons } = show;
 
-  // reformat some of the values
   first_air_date = first_air_date.slice(0, 4);
-  // loop through genres - label each as 'g', eg for g in genres, then return g.name for each and add a comma and space
   genres = genres
     .slice(0, 3)
     .map((g) => g.name)
     .join(", ");
 
-  // find out what active tab the user is on, and create a function that updates the router to a new path including that tab pressed
   const activeTab = searchParams.get("tab") || "episodes";
   const handleTabClick = (tab) => {
     router.push(`${pathname}?tab=${tab}`, { scroll: true });
   };
 
-  // set logic for the watchlisting, when user presses the watchlist button, it changes state of watchlisted
-  const [state, formAction] = useActionState(addShowToWatchlist, {})
+  const [, formAction] = useActionState(addShowToWatchlist, {})
   let { initialWatchlistStatus } = allUserInfo;
   const [watchlisted, setWatchlistStatus] = useState(initialWatchlistStatus);
 

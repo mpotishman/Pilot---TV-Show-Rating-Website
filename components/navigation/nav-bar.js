@@ -6,7 +6,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import NavBarButtons from "../buttons/nav-bar-buttons";
-import { login, logout } from "@/actions/auth-actions";
+import { logout } from "@/actions/auth-actions";
 
 import { motion, AnimatePresence } from "motion/react";
 import NavProfileButtons from "./nav-profile-buttons";

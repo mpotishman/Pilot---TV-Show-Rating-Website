@@ -1,15 +1,12 @@
-// app/profile/[[...profileId]]/page.js
 import ProfileTabSection from "@/components/profile/profile-tab-section";
 import ProfileTopSection from "@/components/profile/profile-top-section";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserById, getUserByUsername } from "@/lib/user";
+import { getUserByUsername } from "@/lib/user";
 import React from "react";
 import getWatchedShows from "@/lib/user";
-import getShowById, { getEpisodeDetails } from "@/actions/actions";
+import getShowById, { getEpisodeDetails, getSeasonDetails } from "@/actions/actions";
 import { getWatchedListedShows } from "@/lib/watchlist";
 import { getRatingInformation } from "@/lib/ratings";
-import { getTVDetails } from "@/actions/actions";
-import { getSeasonDetails } from "@/actions/actions";
 
 export default async function ProfilePage({ params, searchParams }) {
   // Await params first
@@ -21,10 +18,7 @@ export default async function ProfilePage({ params, searchParams }) {
   // Don't index it - it's already the username
   const currentViewedProfile = username; // ← remove [0]
 
-  console.log("Current viewed profile:", currentViewedProfile);
-
   const profileInfo = await getUserByUsername(currentViewedProfile);
-  console.log("Profile Info = ", profileInfo);
 
   // get id of the current user
   const currentUserId = (await getCurrentUser()).user.id;
@@ -40,7 +34,6 @@ export default async function ProfilePage({ params, searchParams }) {
   // first get the show Id's on shows watched by the user
   const showsWatched = await getWatchedShows([profileInfo.id]);
   const showIds = showsWatched.map((row) => row.show_id);
-  console.log("Shows watched = ", showIds);
 
   // now loop through all the show Ids, and get information on all of them
   let showWatchedInformation = [];
@@ -48,8 +41,6 @@ export default async function ProfilePage({ params, searchParams }) {
     const showInformation = await getShowById(id);
     showWatchedInformation.push(showInformation);
   }
-
-  console.log("watched shows = ", showWatchedInformation);
 
   // WATCHLISTED SHOW SECTION
   const watchlistedShows = await getWatchedListedShows([profileInfo.id]);
@@ -61,10 +52,6 @@ export default async function ProfilePage({ params, searchParams }) {
     const showInformation = await getShowById(id);
     watchlistedShowInformation.push(showInformation);
   }
-
-  console.log("watchliated shows = ", watchlistedShowInformation);
-
-  console.log("active tab = ", activeTab);
 
   // RATING INFORMATION SECTION
   const userRatings = await getRatingInformation(profileInfo?.id);
@@ -108,8 +95,6 @@ export default async function ProfilePage({ params, searchParams }) {
       return rating;
     })
   );
-
-  console.log("user ratings = ", enrichedRatings);
 
   return (
     <>

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm components/debug/focus-logger.client.jsx components/debug/full-page-refresh.js app/api/client-log/route.js TODO.md)",
+      "Bash(rmdir components/debug app/api/client-log app/api)",
+      "Bash(npm run *)",
+      "Bash(grep -v \"^$\")",
+      "Bash(git add *)",
+      "Bash(git restore *)"
+    ]
+  }
+}

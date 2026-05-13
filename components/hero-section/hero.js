@@ -1,7 +1,6 @@
 import React from "react";
 import Image from "next/image";
 import { getPopular } from "@/actions/actions";
-import NavBarButtons from "../buttons/nav-bar-buttons";
 import ShowCard from "../shows/show-card";
 import LandingButtons from "../buttons/landing-buttons";
 

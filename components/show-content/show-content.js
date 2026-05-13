@@ -1,7 +1,5 @@
-// components/show-content/show-content.js
 import ShowTopSection from "@/components/shows/show-page/show-top-section";
 import ShowTabContent from "@/components/shows/show-page/show-tab-content";
-import FocusLogger from "@/components/debug/focus-logger.client";
 
 export default function ShowContent({
   activeInfo,
@@ -10,7 +8,7 @@ export default function ShowContent({
 }) {
 
   const {showId, showInfo} = allShowInfo;
-  const {isLoggedIn, viewedProfileUsername} = allUserInfo;
+  const {isLoggedIn} = allUserInfo;
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-[#0a0e17] via-[#0a0e17] to-[#1a1f2e]">

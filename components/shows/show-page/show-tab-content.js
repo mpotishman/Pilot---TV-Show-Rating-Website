@@ -1,7 +1,5 @@
-// ShowTabContent.js
 "use client";
 import React from "react";
-import { useSearchParams } from "next/navigation";
 import ShowEpisodesSection from "@/components/shows/show-page/show-detail/episode-section/show-episodes-section";
 import ShowOverviewSection from "@/components/shows/show-page/show-detail/overview-section/show-overview-section";
 import ShowCastSection from "@/components/shows/show-page/show-detail/cast-section/show-cast-section";
@@ -27,8 +25,6 @@ export default function ShowTabContent({
     castInfo,
     similarInfo,
   } = allShowInfo;
-
-  const {viewedProfileUsername} = allUserInfo;
 
 
   switch (activeTab) {

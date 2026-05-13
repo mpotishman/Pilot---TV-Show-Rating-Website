@@ -1,12 +1,11 @@
 'use client';
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import TabButtons from "../buttons/tab-buttons";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 export default function ProfileTopSection({
   profileInfo,
-  currentViewedProfile,
   canEdit
 }) {
   const searchParams = useSearchParams();
@@ -14,7 +13,6 @@ export default function ProfileTopSection({
   const pathname = usePathname();
 
   const bio = profileInfo?.bio || null;
-  const viewingOwnProfile = String(profileInfo?.id) === String(currentViewedProfile);
 
   // find out what active tab the user is on
   const activeTab = searchParams?.get("tab") || "watched";

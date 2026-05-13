@@ -1,4 +1,3 @@
-import { getTrending } from "@/actions/actions";
 import React from "react";
 
 import Hero from "@/components/hero-section/hero";

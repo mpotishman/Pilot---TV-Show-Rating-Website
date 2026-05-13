@@ -4,8 +4,6 @@ import ProfileWatchlistSection from "./profile-watchlist-section/profile-watchli
 import ProfileRatingSection from "./profile-rating-section/profile-rating-section";
 
 export default function ProfileTabSection({ activeTab, watchedShows, watchlistedShows, ratingInformation }) {
-  let content;
-
   switch (activeTab){
     case 'watched':
       return <ProfileWatchedSection watchedShows={watchedShows}/>

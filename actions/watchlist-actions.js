@@ -1,10 +1,8 @@
-// app/actions/watchlist-actions.js
 "use server";
 
 import { getCurrentUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { insertWatchlistedShow, removeWatchlistedShow } from "@/lib/watchlist";
-import { addWatchlistToActivity } from "@/lib/activity-actions";
 
 export default async function addShowToWatchlist(prevState, formData) {
   const currentUser = await getCurrentUser();
@@ -39,7 +37,7 @@ export default async function addShowToWatchlist(prevState, formData) {
       await removeWatchlistedShow(userId, showId);
       revalidatePath(`/${username}/shows/${showId}`);
       return { success: true, added: false };
-    } catch (error) {
+    } catch {
       return {
         errors: {
           general:
@@ -49,14 +47,7 @@ export default async function addShowToWatchlist(prevState, formData) {
     }
   } else {
     try {
-      console.log("Adding to watchlist...");
       await insertWatchlistedShow(userId, showId, showName);
-      console.log("Inserted to watchlist table");
-
-      // console.log("Adding to activity with:", { userId, showId, showName });
-      // await addWatchlistToActivity(userId, "added_watchlist", showId, showName);
-      // console.log("Added to activity table");
-
       revalidatePath(`/${username}/shows/${showId}`);
       return { success: true, added: true };
     } catch (error) {

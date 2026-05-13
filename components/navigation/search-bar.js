@@ -6,7 +6,7 @@ import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 export default function SearchBar() {
   const [query, setQuery] = useState("");
   const [clicked, setClicked] = useState(false);
-  const [enter, setEntered] = useState(false);
+  const [, setEntered] = useState(false);
   const searchRef = useRef(null);
 
   useEffect(() => {

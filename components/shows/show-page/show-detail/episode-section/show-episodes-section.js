@@ -1,11 +1,8 @@
-// ShowEpisodesSection.js
 "use client";
 import React from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import SeasonEpisodesDisplay from "./season-episodes-display";
 import SeasonButtons from "@/components/buttons/season-buttons";
-import RateModal from "@/components/modal/modal-container";
 
 export default function ShowEpisodesSection({
   activeInfo,
@@ -16,11 +13,7 @@ export default function ShowEpisodesSection({
   // console.log("seasonInfo received:", seasonInfo);
   // console.log("seasonInfo type:", typeof seasonInfo);
 
-  // destructure activeInfo
   const { activeSeason } = activeInfo;
-  const {viewedProfileUsername} = allUserInfo;
-
-  // destructure allShowInfo
   const { showId, seasons } = allShowInfo;
 
   const seasonCount = typeof seasons === "number" ? seasons : 0;
@@ -28,10 +21,6 @@ export default function ShowEpisodesSection({
 
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  // const activeSeason = searchParams.get("season") || "1";
-  // const activeEpisode = searchParams.get("episode") || "1";
 
   const handleSeasonClick = (seasonSelected) => {
     router.push(`${pathname}?tab=episodes&season=${seasonSelected}`, {
